@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: consumesafe-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: consumesafe
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5000
+  egress:
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 53  # DNS
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53  # DNS

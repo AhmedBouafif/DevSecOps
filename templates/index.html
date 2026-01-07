@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ConsumeSafe - Boycott Product Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .flag {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .flag-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .flag-img {
+            height: 60px;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .flag-img:hover {
+            transform: scale(1.1);
+        }
+
+        .flag-img.small {
+            height: 24px;
+            width: auto;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+        }
+
+        .search-box button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.warning {
+            background: #fff3cd;
+            border: 2px solid #ffeeba;
+            color: #856404;
+        }
+
+        .result.boycott {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .alternatives {
+            margin-top: 20px;
+        }
+
+        .alternatives h4 {
+            color: #155724;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .alternative-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .alternative-item h5 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .alternative-item p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: none;
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="flag-container">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg" alt="Palestine Flag" class="flag-img">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg" alt="Tunisia Flag" class="flag-img">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg" alt="Palestine Flag" class="flag-img">
+            </div>
+            <h1>ConsumeSafe</h1>
+            <p>Support Palestine 🇵🇸 - Support Tunisia 🇹🇳</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="productInput" placeholder="Enter product or brand name..." autocomplete="off">
+            <button onclick="checkProduct()">Check Product</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Checking product...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Allow Enter key to submit
+        document.getElementById('productInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkProduct();
+            }
+        });
+
+        async function checkProduct() {
+            const productInput = document.getElementById('productInput');
+            const productName = productInput.value.trim();
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+
+            // Reset displays
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            resultDiv.className = 'result';
+
+            if (!productName) {
+                showError('Please enter a product name');
+                return;
+            }
+
+            // Show loading
+            loadingDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/check-product', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ product_name: productName })
+                });
+
+                loadingDiv.style.display = 'none';
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'An error occurred');
+                }
+
+                const data = await response.json();
+                displayResult(data);
+
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                showError(error.message || 'Failed to check product. Please try again.');
+            }
+        }
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            
+            if (data.is_boycott) {
+                resultDiv.className = 'result boycott';
+                let html = `
+                    <h3>${data.message}</h3>
+                    <p><strong>Brand:</strong> ${data.product.brand}</p>
+                    <p><strong>Category:</strong> ${data.product.category}</p>
+                `;
+
+                if (data.alternatives && data.alternatives.length > 0) {
+                    html += `
+                        <div class="alternatives">
+                            <h4><img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg" class="flag-img small"> Tunisian Alternatives:</h4>
+                    `;
+
+                    data.alternatives.forEach(alt => {
+                        html += `
+                            <div class="alternative-item">
+                                <h5><img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg" class="flag-img small"> ${alt.name}</h5>
+                                <p>${alt.description}</p>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                }
+
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `<h3>${data.message}</h3>`;
+            }
+
+            resultDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

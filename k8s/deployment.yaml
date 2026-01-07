@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumesafe-deployment
+  labels:
+    app: consumesafe
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: consumesafe
+  template:
+    metadata:
+      labels:
+        app: consumesafe
+    spec:
+      containers:
+      - name: consumesafe
+        image: consumesafe:latest
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: PORT
+          value: "5000"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consumesafe-service
+  labels:
+    app: consumesafe
+spec:
+  type: LoadBalancer
+  selector:
+    app: consumesafe
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  sessionAffinity: ClientIP
